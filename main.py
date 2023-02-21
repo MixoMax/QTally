@@ -206,10 +206,11 @@ class Counter(QWidget):
             if keyboard.is_pressed(random_key):
                 os.remove(csv_path)
                 print("Reset")
+                self.load_csv()
                 break
         else:
             print("Reset cancelled")
-        self.load_csv()
+        
     
     def load_csv(self):
         global csv_path
@@ -258,7 +259,7 @@ class Counter(QWidget):
             case "L": self.load_csv()
             case "S": self.create_new_csv()
         
-
+#
 
 if __name__ == '__main__':
     app = QApplication([])
