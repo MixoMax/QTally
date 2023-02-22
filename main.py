@@ -1,22 +1,18 @@
-def req():
-    import os
-    try:
-        import PySide6, keyboard, pyperclip
-        return True
-    except:
-        os.system("pip install PySide6 keyboard pyperclip") if os.name == "nt" else os.system("pip3 install PySide6 keyboard pyperclip")
-        return False
-req()
 import os
 import csv
 import time
-from PySide6.QtCore import Qt
-from PySide6.QtWidgets import QApplication, QMainWindow, QWidget, QVBoxLayout, QGridLayout, QLineEdit, QPushButton, QLabel, QHBoxLayout, QFileDialog, QFileIconProvider
 import random
 import string
 import keyboard
 import math
-import pyperclip
+
+from kivy.app import App
+from kivy.core.window import Window
+from kivy.uix.widget import Widget
+from kivy.uix.label import Label
+from kivy.uix.button import Button
+from kivy.uix.boxlayout import BoxLayout
+
 
 global csv_path
 
@@ -26,12 +22,14 @@ csv_path = "./count.csv"
 
 print("[Q] quit, [R] reset, [S] save, [L] load")
 
+
 def csv_exists():
     try:
         with open(csv_path, "r") as f:
             return True
     except FileNotFoundError:
         return False
+
 
 def csv_read(row, column):
     with open(csv_path, "r") as f:
@@ -43,11 +41,13 @@ def csv_read(row, column):
         except FileNotFoundError:
             return create_csv()
 
+
 def create_csv():
     with open(csv_path, "w", newline="") as f:
         writer = csv.writer(f)
         writer.writerow([0, 0, time.time()])
         return 0
+
 
 t_start = time.time() if not csv_exists() else csv_read(0, 2)
 
@@ -57,220 +57,93 @@ if not csv_exists():
     create_csv()
 
 
-
-class Counter(QWidget):
-    def __init__(self):
-        super().__init__()
+class Counter(Widget):
+    def __init__(self, **kwargs):
+        super(Counter, self).__init__(**kwargs)
         self.count = 0 if not csv_exists() else int(csv_read(-1, 0))
         self.timestamp_abs = math.floor((time.time()-t_start)*1000)
+        self.key_down = False
         self.initUI()
-        self.keyPressEvent = self.handle_key_press
-        self.resizeEvent = self.onResize
-        self.Window_size = self.size()
-        self.Window_x = self.Window_size.width()
-        self.Window_y = self.Window_size.height()
-        self.font_size = self.Window_y / 10
-        self.button_size = int(self.Window_y / 10)
-        self.last_key = ""
 
     def initUI(self):
-        #set screen size
-        self.setMinimumSize(100, 100)
-        self.setMaximumSize(400, 400)
-        self.setWindowTitle("Counter")
-
         # create label to display count
-        self.count_label = QLabel(str(self.count), self)
-        self.count_label.setAlignment(Qt.AlignCenter)
+        self.count_label = Label(text=str(self.count), font_size=24, halign="center")
 
         # create buttons to add and subtract
-        self.add_button = QPushButton("+", self)
-        self.sub_button = QPushButton("-", self)
+        self.add_button = Button(text="+")
+        self.sub_button = Button(text="-")
 
         # set stylesheet for widgets
-        self.setStyleSheet('''
-            background-color: #1e1e1e;
-            color: #f0f0f0;
-            border: none;
-        ''')
+        self.count_label.background_color = (0, 0, 0, 1)
+        self.count_label.color = (1, 1, 1, 1)
 
-        self.count_label.setStyleSheet('''
-            font-size: 24px;
-        ''')
+        self.add_button.background_color = (0.23, 0.23, 0.23, 1)
+        self.add_button.color = (1, 1, 1, 1)
+        self.add_button.font_size = 18
+        self.add_button.border_radius = 15
+        self.add_button.padding = (10, 20)
 
-        self.add_button.setStyleSheet('''
-            background-color: #3a3a3a;
-            color: #f0f0f0;
-            font-size: 18px;
-            border-radius: 15px;
-            padding: 10px 20px;
-        ''')
-
-        self.sub_button.setStyleSheet('''
-            background-color: #3a3a3a;
-            color: #f0f0f0;
-            font-size: 18px;
-            border-radius: 15px;
-            padding: 10px 20px;
-        ''')
+        self.sub_button.background_color = (0.23, 0.23, 0.23, 1)
+        self.sub_button.color = (1, 1, 1, 1)
+        self.sub_button.font_size = 18
+        self.sub_button.border_radius = 15
+        self.sub_button.padding = (10, 20)
 
         # create horizontal layout for buttons
-        hbox = QHBoxLayout()
-        hbox.addWidget(self.sub_button, 1)
-        hbox.addWidget(self.add_button, 1)
+        hbox = BoxLayout()
+        hbox.add_widget(self.sub_button)
+        hbox.add_widget(self.add_button)
 
         # create vertical layout and add widgets
-        vbox = QVBoxLayout()
-        vbox.addWidget(self.count_label, 1)
-        vbox.addLayout(hbox)
+        vbox = BoxLayout(orientation="vertical")
+        vbox.add_widget(self.count_label)
+        vbox.add_widget(hbox)
 
         # set layout
-        self.setLayout(vbox)
+        self.add_widget(vbox)
 
         # connect buttons to functions
-        self.add_button.clicked.connect(self.add)
-        self.sub_button.clicked.connect(self.subtract)
+        self.add_button.bind(on_press=self.add)
+        self.sub_button.bind(on_press=self.subtract)
 
+        # bind resize event
+        Window.bind(on_resize=self.onResize)
+        
 
-    def onResize(self, event):
-        self.Window_size = self.size()
-        self.Window_x = self.Window_size.width()
-        self.Window_y = self.Window_size.height()
+        
+    def onResize(self, instance, size):
+        self.Window_size = size
+        self.Window_x = self.Window_size[0]
+        self.Window_y = self.Window_size[1]
         self.font_size = int(self.Window_y / 3)
         self.button_size = int(self.Window_y / 10)
 
         # change font size when window is resized
-        self.count_label.style().unpolish(self.count_label)
-        self.count_label.setStyleSheet(f"font-size: {self.font_size}px;")
-        self.count_label.style().polish(self.count_label)
-        self.count_label.update()
+        self.count_label.font_size = self.font_size
 
-        self.add_button.style().unpolish(self.add_button)
-        self.add_button.setStyleSheet(f'''
-            background-color: #3a3a3a;
-            color: #f0f0f0;
-            font-size: {self.button_size}px;
-            border-radius: 15px;
-            padding: 10px 20px;
-        ''')
-        self.add_button.style().polish(self.add_button)
-        self.add_button.update()
-        
-        self.sub_button.style().unpolish(self.sub_button)
-        self.sub_button.setStyleSheet(f'''
-            background-color: #3a3a3a;
-            color: #f0f0f0;
-            font-size: {self.button_size}px;
-            border-radius: 15px;
-            padding: 10px 20px;
-        ''')
-        self.sub_button.style().polish(self.sub_button)
-        self.sub_button.update()
-
-
-    def add(self):
+        self.add_button.font_size = self.button_size
+        self.add_button.padding = [10, 20]
+        self.sub_button.font_size = self.button_size
+        self.sub_button.padding = [10, 20]
+    
+    def add(self, instance):
         self.count += 1
-        self.count_label.setText(str(self.count))
+        self.count_label.text = str(self.count)
         self.timestamp_abs = math.floor((time.time()-t_start)*1000)
-        self.record_count()
-        time.sleep(1/20)
-
-    def subtract(self):
+     
+    def subtract(self, instance):
         self.count -= 1
-        self.count_label.setText(str(self.count))
+        self.count_label.text = str(self.count)
         self.timestamp_abs = math.floor((time.time()-t_start)*1000)
-        self.record_count()
-        time.sleep(1/20)
+    
+    
+    
+class CounterApp(App):
+    def build(self):
+        # create the counter widget
+        return Counter()
 
-    def record_count(self):
-        # write count and timestamp to CSV file
-        with open(csv_path, "a", newline="") as f:
-            writer = csv.writer(f)
-            writer.writerow([self.count, self.timestamp_abs, time.time()])
-    
-    def close_2(self):
-        random_key = random.choice(string.ascii_letters).lower()
-        print(f"Press {random_key} to close")
-        t1 = time.time()
-        while time.time()-t1 < 3:
-            if keyboard.is_pressed(random_key):
-                self.close()
-                break
-        
-#
-    
-    def reset_csv(self):
-        random_key = random.choice(string.ascii_letters).lower()
-        print(f"Press {random_key} to reset")
-        t1 = time.time()
-        while time.time()-t1 < 3:
-            if keyboard.is_pressed(random_key):
-                os.remove(csv_path)
-                print("Reset")
-                self.load_csv()
-                break
-        else:
-            print("Reset cancelled")
-        
-    
-    def load_csv(self):
-        global csv_path
-        # load CSV file
-        
-        #open explorer to select file
-        csv_path = QFileDialog.getOpenFileName(self, "Open CSV", "", "CSV Files (*.csv)")[0]
-        
-        if csv_exists():
-            print(f"CSV loaded: {csv_path}")
-            self.count = int(csv_read(-1, 0))
-            self.count_label.setText(str(self.count))
-            self.count_label.update()
-            t_start = csv_read(0,2)
-            self.timestamp_abs = math.floor((time.time()-t_start)*1000)
-        else:
-            self.close()
+if __name__ == "__main__":
+    CounterApp().run()
 
-    def create_new_csv(self):
-        global csv_path
-        # create CSV file
-        
-        #open explorer to select file
-        csv_path = QFileDialog.getSaveFileName(self, "Save CSV", "", "CSV Files (*.csv)")[0]
-        
-        with open(csv_path, "w", newline="") as f:
-            writer = csv.writer(f)
-            writer.writerow([str(int(self.count)), 0, time.time()])
-            print(f"CSV created: {csv_path}")
-        
-    
-    def copy_to_clipboard(self):
-        clipboard = QApplication.clipboard()
-        clipboard.setText(self.count_label.text())
-        print("Copied to clipboard")
-    
-    
-    def handle_key_press(self, event):
-        key = event.key()
-
-        if key < 256:
-            key = chr(key)
-        
-        self.last_key = key
-
-        match key:
-            case "+": self.add()
-            case "-": self.subtract()
-            case "Q": self.close_2()
-            case "R": self.reset_csv()
-            case "X": self.reset_csv()
-            case "L": self.load_csv()
-            case "S": self.create_new_csv()
-            case "C": self.copy_to_clipboard()
-        
-#
-
-if __name__ == '__main__':
-    app = QApplication([])
-    counter = Counter()
-    counter.show()
-    app.exec()
+    print("Bye!")
