@@ -1,10 +1,10 @@
 def req():
     import os
     try:
-        import PySide6
+        import PySide6, keyboard, pyperclip
         return True
     except:
-        os.system("pip install PySide6") if os.name == "nt" else os.system("pip3 install PySide6") if os.name == "posix" else print("OS not supported")
+        os.system("pip install PySide6 keyboard pyperclip") if os.name == "nt" else os.system("pip3 install PySide6 keyboard pyperclip")
         return False
 req()
 import os
@@ -16,6 +16,7 @@ import random
 import string
 import keyboard
 import math
+import pyperclip
 
 global csv_path
 
@@ -242,6 +243,12 @@ class Counter(QWidget):
             print(f"CSV created: {csv_path}")
         
     
+    def copy_to_clipboard(self):
+        clipboard = QApplication.clipboard()
+        clipboard.setText(self.count_label.text())
+        print("Copied to clipboard")
+    
+    
     def handle_key_press(self, event):
         key = event.key()
 
@@ -258,6 +265,7 @@ class Counter(QWidget):
             case "X": self.reset_csv()
             case "L": self.load_csv()
             case "S": self.create_new_csv()
+            case "C": self.copy_to_clipboard()
         
 #
 
