@@ -5,6 +5,12 @@ import java.io.*;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+//TODO:
+// 1. change time format to unix time stamp and absolute time
+
+// 2. Add keyboard shortcuts to the buttons
+
+
 public class TallyCounter extends JFrame implements ActionListener {
     private int count;
     private JLabel countLabel;
