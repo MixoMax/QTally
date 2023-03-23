@@ -1,0 +1,43 @@
+<MyRoot>:
+
+    counter_label: counter_label
+
+    BoxLayout:
+        orientation: "vertical"
+
+        Label:
+            id: counter_label
+            text: "0"
+            font_size: 100
+            size_hint_y: 0.5
+            halign: "center"
+            valign: "middle"
+        
+        BoxLayout:
+            orientation: "horizontal"
+            size_hint_y: 0.5
+
+            BoxLayout:
+                orientation: "vertical"
+
+                
+                Button:
+                    text: "Share"
+                    font_size: 50
+                    on_press: root.share()
+                
+                Button:
+                    text: "Delete"
+                    font_size: 50
+                    on_press: root.delete()
+
+
+            Button:
+                text: "-"
+                font_size: 100
+                on_press: root.decrement()
+            
+            Button:
+                text: "+"
+                font_size: 100
+                on_press: root.increment()
