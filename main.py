@@ -5,6 +5,9 @@ from kivy.uix.button import Button
 from kivy.uix.boxlayout import BoxLayout
 from kivy.setupconfig import USE_SDL2
 from kivy.core.audio import SoundLoader
+from kivymd.app import MDApp
+from kivy.lang import Builder
+from kivy.properties import ObjectProperty
 
 import os
 import csv
@@ -18,7 +21,11 @@ global csv_path
 
 kivy.require("1.9.0")
 
-os.chdir(os.path.dirname(os.path.abspath(__file__)))
+platform = kivy.utils.platform
+
+file_path = os.path.dirname(os.path.realpath(__file__))
+
+os.chdir(file_path)
 
 csv_path = "./count.csv"
 
@@ -53,6 +60,8 @@ if not csv_exists():
 
 
 class MyRoot(BoxLayout):
+    counter_label = ObjectProperty()
+
     def __init__(self, **kwargs):
         super(MyRoot, self).__init__(**kwargs)
         self.update_label()
@@ -77,20 +86,22 @@ class MyRoot(BoxLayout):
 
 
 
-class counterapp(App):
+class counterapp(MDApp):
     def __init__(self, **kwargs):
         super(counterapp, self).__init__(**kwargs)
         self.count = 0 if not csv_exists() else int(csv_read(-1,0))
         self.timestamp_abs = math.floor((time.time()-t_start)*1000)
         self.delete_presses = []
-        self.up_sound = SoundLoader.load("./data/audio/up.mp3")
-        self.down_sound = SoundLoader.load("./data/audio/down.mp3")
+        if platform == "win":
+            self.up_sound = SoundLoader.load("./data/audio/up.mp3")
+            self.down_sound = SoundLoader.load("./data/audio/down.mp3")
     
     def add(self):
         self.count += 1
         self.timestamp_abs = math.floor((time.time()-t_start)*1000)
         self.record_count()
-        self.up_sound.play()
+        if platform == "win":
+            self.up_sound.play()
         time.sleep(1/100)
 
 
@@ -98,7 +109,8 @@ class counterapp(App):
         self.count -= 1
         self.timestamp_abs = math.floor((time.time()-t_start)*1000)
         self.record_count()
-        self.up_sound.play()
+        if platform == "win":
+            self.up_sound.play()
         time.sleep(1/100)
 
 
@@ -131,7 +143,6 @@ class counterapp(App):
     def share(self):
         """share current csv file via android intent"""
         
-        platform = kivy.utils.platform
         print(platform)
         
         if platform == "android":

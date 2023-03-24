@@ -1,14 +1,36 @@
 # Counter
 
-A simple counter app built with Pyside6 Qt for Python.
+A simple counter app built with kivy, that can be run on Windows, Linux, MacOs, Android and ios
 
 ## Installation
 
-```pip install pyside6, keyboard```
+Windows:
+>pip install kivy keyboard
+
+Linux and MacOs:
+>pip3 install kivy keyboard
+
+Compilation for android (Linux and MacOs)
+see [buildozer](https://buildozer.readthedocs.io/en/latest/quickstart.html)
+
+Compilation for ios (MacOs)
+see [buildozer](https://buildozer.readthedocs.io/en/latest/quickstart.html)
 
 ## Usage
 
-```python main.py```
+Windows:
+>python main.py
+
+Linux and MacOs:
+>python3 main.py
+
+## Buildozer
+
+Install APK on Android device
+
+or 
+
+Install IPA on ios device
 
 ## License
 

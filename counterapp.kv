@@ -1,45 +1,66 @@
-#:kivy 1.9.0
+#:kivy 2.0.0
 
 <MyRoot>:
-
     counter_label: counter_label
 
     BoxLayout:
         orientation: "vertical"
+        spacing: dp(20)
+        padding: dp(20)
+        canvas:
+            Color:
+                rgba: 0.2, 0.2, 0.2, 1
+            Rectangle:
+                pos: self.pos
+                size: self.size
 
         Label:
             id: counter_label
             text: "0"
-            font_size: 100
-            size_hint_y: 0.5
+            font_size: sp(120)
             halign: "center"
             valign: "middle"
-        
+            bold: True
+
         BoxLayout:
             orientation: "horizontal"
+            spacing: dp(20)
             size_hint_y: 0.5
 
             BoxLayout:
                 orientation: "vertical"
+                spacing: dp(20)
 
-                
-                Button:
-                    text: "Share"
-                    font_size: 50
+                MDIconButton:
+                    icon: "share-variant"
+                    theme_text_color: "Custom"
+                    text_color: app.theme_cls.accent_color
+                    user_font_size: sp(40)
                     on_press: root.share()
-                
-                Button:
-                    text: "Delete"
-                    font_size: 50
+
+                MDIconButton:
+                    icon: "delete"
+                    theme_text_color: "Custom"
+                    text_color: app.theme_cls.accent_color
+                    user_font_size: sp(40)
                     on_press: root.delete()
 
-
-            Button:
-                text: "-"
-                font_size: 100
+            MDIconButton:
+                icon: "minus"
+                theme_text_color: "Custom"
+                text_color: app.theme_cls.accent_color
+                user_font_size: sp(80)
+                size_hint: None, None
+                size: dp(400), dp(400)
+                pos_hint: {"center_y": 0.5}
                 on_press: root.decrement()
-            
-            Button:
-                text: "+"
-                font_size: 100
+
+            MDIconButton:
+                icon: "plus"
+                theme_text_color: "Custom"
+                text_color: app.theme_cls.accent_color
+                user_font_size: sp(80)
+                size_hint: None, None
+                size: dp(400), dp(400)
+                pos_hint: {"center_y": 0.5}
                 on_press: root.increment()
