@@ -4,11 +4,14 @@ from kivy.uix.label import Label
 from kivy.uix.button import Button
 from kivy.uix.boxlayout import BoxLayout
 from kivy.setupconfig import USE_SDL2
+from kivy.core.window import Window
+from kivy.uix.widget import Widget
 
 import os
 import csv
 import time
 import math
+import keyboard
 
 global csv_path
 
@@ -53,6 +56,7 @@ if not csv_exists():
 class MyRoot(BoxLayout):
     def __init__(self, **kwargs):
         super(MyRoot, self).__init__(**kwargs)
+        self.update_label()
     
     def update_label(self):
         self.counter_label.text = str(counter.count)
@@ -77,7 +81,7 @@ class MyRoot(BoxLayout):
 class counterapp(App):
     def __init__(self, **kwargs):
         super(counterapp, self).__init__(**kwargs)
-        self.count = 0 if not csv_exists() else int(csv_read(0, 0))
+        self.count = 0 if not csv_exists() else int(csv_read(-1,0))
         self.timestamp_abs = math.floor((time.time()-t_start)*1000)
         self.delete_presses = []
     
@@ -162,6 +166,7 @@ class counterapp(App):
 
     def build(self):
         return MyRoot()
+
 
 
 if __name__ == "__main__":
