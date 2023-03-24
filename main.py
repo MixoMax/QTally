@@ -4,8 +4,7 @@ from kivy.uix.label import Label
 from kivy.uix.button import Button
 from kivy.uix.boxlayout import BoxLayout
 from kivy.setupconfig import USE_SDL2
-from kivy.core.window import Window
-from kivy.uix.widget import Widget
+from kivy.core.audio import SoundLoader
 
 import os
 import csv
@@ -84,11 +83,14 @@ class counterapp(App):
         self.count = 0 if not csv_exists() else int(csv_read(-1,0))
         self.timestamp_abs = math.floor((time.time()-t_start)*1000)
         self.delete_presses = []
+        self.up_sound = SoundLoader.load("./data/audio/up.mp3")
+        self.down_sound = SoundLoader.load("./data/audio/down.mp3")
     
     def add(self):
         self.count += 1
         self.timestamp_abs = math.floor((time.time()-t_start)*1000)
         self.record_count()
+        self.up_sound.play()
         time.sleep(1/100)
 
 
@@ -96,6 +98,7 @@ class counterapp(App):
         self.count -= 1
         self.timestamp_abs = math.floor((time.time()-t_start)*1000)
         self.record_count()
+        self.up_sound.play()
         time.sleep(1/100)
 
 
