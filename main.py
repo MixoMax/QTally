@@ -117,14 +117,14 @@ class counterapp(MDApp):
     def delete(self):
         self.delete_presses.append(time.time())
         
-        print(self.delete_presses)
-        
         valid_presses = [press for press in self.delete_presses if press > time.time()-2]
         
         if len(valid_presses) > 5:
             os.remove(csv_path)
             print("deleted")
             self.load_csv()
+        else:
+            print("press", 6 - len(valid_presses), "more times to delete")
 
 
     def load_csv(self):
@@ -143,7 +143,8 @@ class counterapp(MDApp):
     def share(self):
         """share current csv file via android intent"""
         
-        print(platform)
+        if platform != "android":
+            print("you are on " + platform + ". this feature is only available on android")
         
         if platform == "android":
             from android.storage import primary_external_storage_path
