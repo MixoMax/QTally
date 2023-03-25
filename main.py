@@ -13,7 +13,6 @@ import os
 import csv
 import time
 import math
-import keyboard
 
 global csv_path
 
@@ -143,33 +142,7 @@ class counterapp(MDApp):
     def share(self):
         """share current csv file via android intent"""
         
-        if platform != "android":
-            print("you are on " + platform + ". this feature is only available on android")
-        
-        if platform == "android":
-            from android.storage import primary_external_storage_path
-            from jnius import autoclass
-            from jnius import cast
-            
-            PythonActivity = autoclass("org.kivy.android.PythonActivity")
-            
-            Intent = autoclass("android.content.Intent")
-            String = autoclass("java.lang.String")
-            Uri = autoclass("android.net.Uri")
-            File = autoclass("java.io.File")
-            
-            ShareIntent = Intent(Intent.ACTION_SEND)
-            ShareIntent.setType("text/plain")
-            
-            path = os.path.join(primary_external_storage_path(), "./count.csv")
-        
-            csv_file = File(path)
-            Uri = Uri.fromFile(csv_file)
-            parcelable = cast("android.os.Parcelable", Uri)
-            ShareIntent.putExtra(Intent.EXTRA_STREAM, parcelable)
-            
-            CurrentActivity = cast("android.app.Activity", PythonActivity.mActivity)
-            CurrentActivity.startActivity(ShareIntent)
+        return 0
 
 
     def record_count(self):
