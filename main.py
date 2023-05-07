@@ -48,10 +48,11 @@ def csv_read(row, column):
 def create_csv():
     with open(csv_path, "w", newline="") as f:
         writer = csv.writer(f)
+        writer.writerow(["Stunden", "Anzahl", "timestamp", "Anzahl_Plus"])
         writer.writerow([0, 0, time.time(), 0])
-        return 0
+    return 0
 
-t_start = time.time() if not csv_exists() else csv_read(0, 2)
+t_start = time.time() if not csv_exists() else csv_read(1, 2)
 
 print(csv_exists(), t_start)
 
@@ -121,6 +122,8 @@ class Counter(QWidget):
         hbox = QHBoxLayout()
         hbox.addWidget(self.sub_button, 1)
         hbox.addWidget(self.add_button, 1)
+        
+
 
         # create vertical layout and add widgets
         vbox = QVBoxLayout()
@@ -232,7 +235,7 @@ class Counter(QWidget):
             self.count = int(csv_read(-1, 0))
             self.count_label.setText(str(self.count))
             self.count_label.update()
-            t_start = csv_read(0,2)
+            t_start = csv_read(1,2)
             self.timestamp_rel = self.update_timestamp_rel()
         else:
             self.close()
