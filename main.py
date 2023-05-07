@@ -20,7 +20,9 @@ import pyperclip
 
 global csv_path
 
-os.chdir(os.path.dirname(os.path.abspath(__file__)))
+user_name = os.getlogin()
+
+os.chdir(f"C:/Users/{user_name}/Documents")
 
 csv_path = "./count.csv"
 
@@ -46,7 +48,7 @@ def csv_read(row, column):
 def create_csv():
     with open(csv_path, "w", newline="") as f:
         writer = csv.writer(f)
-        writer.writerow([0, 0, time.time()])
+        writer.writerow([0, 0, time.time(), 0])
         return 0
 
 t_start = time.time() if not csv_exists() else csv_read(0, 2)
@@ -61,8 +63,8 @@ if not csv_exists():
 class Counter(QWidget):
     def __init__(self):
         super().__init__()
-        self.count = 0 if not csv_exists() else int(csv_read(-1, 0))
-        self.timestamp_abs = math.floor((time.time()-t_start)*1000)
+        self.count = 0 if not csv_exists() else int(csv_read(-1, 1))
+        self.timestamp_rel = self.update_timestamp_rel()
         self.initUI()
         self.keyPressEvent = self.handle_key_press
         self.resizeEvent = self.onResize
@@ -71,6 +73,7 @@ class Counter(QWidget):
         self.Window_y = self.Window_size.height()
         self.font_size = self.Window_y / 10
         self.button_size = int(self.Window_y / 10)
+        self.plus_count = 0
         self.last_key = ""
 
     def initUI(self):
@@ -171,22 +174,27 @@ class Counter(QWidget):
     def add(self):
         self.count += 1
         self.count_label.setText(str(self.count))
-        self.timestamp_abs = math.floor((time.time()-t_start)*1000)
+        self.plus_count += 1
+        self.timestamp_rel = self.update_timestamp_rel()
         self.record_count()
-        time.sleep(1/20)
+        time.sleep(1/30)
 
     def subtract(self):
         self.count -= 1
         self.count_label.setText(str(self.count))
-        self.timestamp_abs = math.floor((time.time()-t_start)*1000)
+        self.timestamp_rel = self.update_timestamp_rel()
         self.record_count()
-        time.sleep(1/20)
+        time.sleep(1/30)
 
     def record_count(self):
         # write count and timestamp to CSV file
         with open(csv_path, "a", newline="") as f:
             writer = csv.writer(f)
-            writer.writerow([self.count, self.timestamp_abs, time.time()])
+            self.timestamp_rel = self.update_timestamp_rel()
+            writer.writerow([self.timestamp_rel, self.count, time.time(), self.plus_count])
+    
+    def update_timestamp_rel(self):
+        return (time.time()-t_start) / 60
     
     def close_2(self):
         random_key = random.choice(string.ascii_letters).lower()
@@ -196,8 +204,7 @@ class Counter(QWidget):
             if keyboard.is_pressed(random_key):
                 self.close()
                 break
-        
-#
+    
     
     def reset_csv(self):
         random_key = random.choice(string.ascii_letters).lower()
@@ -226,7 +233,7 @@ class Counter(QWidget):
             self.count_label.setText(str(self.count))
             self.count_label.update()
             t_start = csv_read(0,2)
-            self.timestamp_abs = math.floor((time.time()-t_start)*1000)
+            self.timestamp_rel = self.update_timestamp_rel()
         else:
             self.close()
 
