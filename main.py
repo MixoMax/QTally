@@ -44,6 +44,8 @@ def csv_read(row, column):
             return 0
         except FileNotFoundError:
             return create_csv()
+        except ValueError:
+            return list(reader)[row][column]
 
 def create_csv():
     with open(csv_path, "w", newline="") as f:
